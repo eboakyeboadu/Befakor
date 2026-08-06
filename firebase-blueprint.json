@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A Befakor marketplace user",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "username": { "type": "string" },
+        "fullName": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "university": { "type": "string" },
+        "dorm": { "type": "string" },
+        "onboardingCompleted": { "type": "boolean" },
+        "karmaEarned": { "type": "integer" },
+        "itemsRehomed": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "username", "university", "onboardingCompleted", "createdAt", "updatedAt"]
+    },
+    "Listing": {
+      "title": "Listing",
+      "description": "A marketplace listing created by a student",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "suggestedSalePrice": { "type": "number" },
+        "condition": { "type": "string" },
+        "buildingOrArea": { "type": "string" },
+        "category": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "sellerEmail": { "type": "string" },
+        "status": { "type": "string" },
+        "imageUrls": { "type": "array" },
+        "claimToken": { "type": "string" },
+        "claimedBy": { "type": "string" },
+        "claimedAt": { "type": "integer" },
+        "freeTier": { "type": "boolean" }
+      },
+      "required": ["title", "description", "suggestedSalePrice", "sellerId", "status", "createdAt"]
+    },
+    "Handoff": {
+      "title": "Handoff",
+      "description": "A circular economy transaction verifying items re-homed successfully",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string" },
+        "itemTitle": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "sellerEmail": { "type": "string" },
+        "buyerId": { "type": "string" },
+        "buyerEmail": { "type": "string" },
+        "rating": { "type": "integer" },
+        "points": { "type": "integer" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["itemId", "itemTitle", "sellerId", "buyerId", "rating", "points", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profiles including their selected university and dorm."
+    },
+    "listings/{listingId}": {
+      "schema": "Listing",
+      "description": "Stores active, drafted, or successfully claimed items on campus."
+    },
+    "handoffs/{handoffId}": {
+      "schema": "Handoff",
+      "description": "Secure ledger documents detailing verified re-homing transactions and assigned karma."
+    }
+  }
+}

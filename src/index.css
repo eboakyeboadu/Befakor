@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", serif;
+
+  --color-background: #fafaf3;
+  --color-foreground: #1a1c18;
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1c18;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1a1c18;
+  --color-primary: #043f2e;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #c8f169;
+  --color-secondary-foreground: #043f2e;
+  --color-muted: #eeeee7;
+  --color-muted-foreground: #404944;
+  --color-accent: #c8f169;
+  --color-accent-foreground: #043f2e;
+  --color-border: #e8e9e2;
+  --color-input: #c0c9c2;
+  --color-ring: #043f2e;
+  
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    min-height: max(884px, 100dvh);
+  }
+}
+
+@layer utilities {
+  .grid-pattern {
+    background-image: radial-gradient(var(--color-primary) 0.5px, transparent 0.5px);
+    background-size: 32px 32px;
+    opacity: 0.05;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .hero-gradient {
+    background: radial-gradient(circle at top right, #c8f16933 0%, transparent 50%),
+                radial-gradient(circle at bottom left, #b8eed633 0%, transparent 50%);
+  }
+}
