@@ -1,6 +1,0 @@
-{
-  "name": "Befakor",
-  "description": "High-end, mobile-first web application designed to streamline the logistical friction of university move-out cycles",
-  "requestFramePermissions": ["geolocation", "camera"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
