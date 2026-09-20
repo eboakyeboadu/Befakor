@@ -1,21 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-import config from "../../firebase-applet-config.json";
-
-// Extract the required client config from standard setup
-const firebaseConfig = {
-  projectId: config.projectId,
-  appId: config.appId,
-  apiKey: config.apiKey,
-  authDomain: config.authDomain,
-  storageBucket: config.storageBucket,
-  messagingSenderId: config.messagingSenderId,
+// Firebase configuration placeholder for public repos
+// Replace with your own Firebase web config before deployment.
+export const firebaseConfig = {
+  apiKey: "REPLACE_WITH_YOUR_API_KEY",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:0000000000000000000000",
 };
-
-const app = initializeApp(firebaseConfig);
-
-export const db = getFirestore(app, config.firestoreDatabaseId);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
