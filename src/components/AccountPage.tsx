@@ -1,8 +1,9 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, writeBatch, serverTimestamp } from "firebase/firestore";
 import { auth, db, storage } from "../lib/firebase";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { compressImageToBase64 } from "../lib/imageUtils";
+import { validateUsernameFormat, checkUsernameAvailability } from "../lib/authValidation";
 import { 
   User as UserIcon, 
   Mail, 
@@ -31,6 +32,7 @@ export default function AccountPage({ mode, onGoToSellerDashboard }: AccountPage
   const [uni, setUni] = useState("");
   const [dorm, setDorm] = useState("");
   const [usernameVal, setUsernameVal] = useState("");
+  const [initialUsername, setInitialUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   
@@ -102,6 +104,7 @@ export default function AccountPage({ mode, onGoToSellerDashboard }: AccountPage
             setUni(data.university || "");
             setDorm(data.dorm || "");
             setUsernameVal(data.username || "");
+            setInitialUsername(data.username || "");
             setFullName(data.fullName || "");
             setPhotoUrl(data.photoUrl || "");
             
@@ -147,15 +150,48 @@ export default function AccountPage({ mode, onGoToSellerDashboard }: AccountPage
     setSuccessMsg("");
     setErrorsMsg("");
 
+    const trimmedUser = usernameVal.trim().toLowerCase();
+    
+    if (trimmedUser !== initialUsername) {
+      const formatCheck = validateUsernameFormat(trimmedUser);
+      if (!formatCheck.valid) {
+        setErrorsMsg(formatCheck.error || "Please choose a valid username (3-20 characters: letters, numbers, or underscores).");
+        setLoading(false);
+        return;
+      }
+
+      const avail = await checkUsernameAvailability(trimmedUser, user.uid);
+      if (!avail.available) {
+        setErrorsMsg(avail.error || `The username "@${trimmedUser}" is already taken by another student.`);
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
-      await updateDoc(doc(db, "users", user.uid), {
+      const batch = writeBatch(db);
+      batch.update(doc(db, "users", user.uid), {
         university: uni,
         dorm: dorm,
-        username: usernameVal.trim().toLowerCase(),
+        username: trimmedUser,
         fullName: fullName.trim(),
         photoUrl: photoUrl,
         updatedAt: new Date()
       });
+
+      if (trimmedUser !== initialUsername) {
+        batch.set(doc(db, "usernames", trimmedUser), {
+          uid: user.uid,
+          createdAt: serverTimestamp()
+        });
+        if (initialUsername) {
+          batch.delete(doc(db, "usernames", initialUsername));
+        }
+      }
+
+      await batch.commit();
+      setInitialUsername(trimmedUser);
+
       try {
         localStorage.setItem("befakor-selected-university", uni);
         localStorage.setItem("befakor-selected-dorm", dorm);

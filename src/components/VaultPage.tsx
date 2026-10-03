@@ -126,6 +126,40 @@ const curatedShowcaseItems: Listing[] = [
     status: "available",
     sellerId: "curated-seller-5",
     sellerEmail: "m.tanner@harvard.edu"
+  },
+  {
+    id: "curated-6",
+    title: "Campus Spring Music Fest - 2x VIP Passes",
+    category: "Event Tickets",
+    description: "2x VIP Student passes with backstage lounge access and commemorative wristbands. Direct student-to-student verification with instant digital barcode transfer.",
+    estimatedOriginalPrice: 120,
+    suggestedSalePrice: 75,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200"
+    ],
+    location: { lat: 42.3740, lng: -71.1170 },
+    buildingOrArea: "Harvard Yard",
+    createdAt: Date.now() - 3600000 * 4,
+    status: "available",
+    sellerId: "curated-seller-6",
+    sellerEmail: "j.park@harvard.edu"
+  },
+  {
+    id: "curated-7",
+    title: "Rivalry Game - Student Section Ticket",
+    category: "Event Tickets",
+    description: "Lower bowl student section ticket for the upcoming rivalry football game. Student ID required at gate. Mobile ticket barcode ready for instant handoff.",
+    estimatedOriginalPrice: 60,
+    suggestedSalePrice: 40,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200"
+    ],
+    location: { lat: 42.3665, lng: -71.1260 },
+    buildingOrArea: "Harvard Stadium",
+    createdAt: Date.now() - 3600000 * 18,
+    status: "available",
+    sellerId: "curated-seller-7",
+    sellerEmail: "d.chen@harvard.edu"
   }
 ];
 
@@ -239,6 +273,16 @@ export default function VaultPage({ onGoToExplore, mode }: VaultPageProps) {
       boosted: false,
       category: "Furniture",
       buildingOrArea: "Dunster House"
+    },
+    {
+      id: "sell-act-9",
+      title: "Spring Formal Gala - 2x Student Tickets",
+      suggestedSalePrice: 50,
+      imageUrls: ["https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80"],
+      views: 110,
+      boosted: false,
+      category: "Event Tickets",
+      buildingOrArea: "Harvard Yard"
     }
   ]);
 
@@ -605,7 +649,7 @@ export default function VaultPage({ onGoToExplore, mode }: VaultPageProps) {
       const session = await response.json();
       
       if (session.url) {
-        // Open Stripe Checkout in a new tab to avoid breaking out of AI Studio iframe
+        // Open Stripe Checkout in a new tab to prevent navigation interruption
         const newTab = window.open(session.url, "_blank");
         if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
           window.location.href = session.url;
@@ -1181,7 +1225,7 @@ export default function VaultPage({ onGoToExplore, mode }: VaultPageProps) {
               {sortedSavedItems.length > 0 ? (
                 <motion.div 
                   layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
                 >
                   <AnimatePresence mode="popLayout">
                     {sortedSavedItems.map((item) => (
@@ -1218,26 +1262,28 @@ export default function VaultPage({ onGoToExplore, mode }: VaultPageProps) {
                           </div>
                         </div>
 
-                        <div className="p-5 flex flex-col flex-1 gap-3 text-left">
-                          <div className="flex justify-between items-start gap-2">
-                            <h3 className="font-sans font-bold text-sm text-primary leading-tight line-clamp-2 pr-2">
-                              {item.title}
-                            </h3>
-                             <div className="flex flex-col items-end shrink-0 gap-0.5">
-                              <span className="font-sans font-extrabold text-sm text-[#2A6F2B]">
-                                ${item.suggestedSalePrice}
-                              </span>
-                              {item.estimatedOriginalPrice > item.suggestedSalePrice && (
-                                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
-                                  {Math.round(((item.estimatedOriginalPrice - item.suggestedSalePrice) / item.estimatedOriginalPrice) * 100)}% OFF
+                        <div className="p-5 flex flex-col flex-1 justify-between gap-3 text-left">
+                          <div>
+                            <div className="flex justify-between items-start gap-2 mb-1">
+                              <h3 className="font-sans font-bold text-sm text-primary leading-tight line-clamp-1 pr-2">
+                                {item.title}
+                              </h3>
+                              <div className="flex flex-col items-end shrink-0 gap-0.5">
+                                <span className="font-sans font-extrabold text-sm text-[#2A6F2B]">
+                                  ${item.suggestedSalePrice}
                                 </span>
-                              )}
+                                {item.estimatedOriginalPrice > item.suggestedSalePrice && (
+                                  <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">
+                                    {Math.round(((item.estimatedOriginalPrice - item.suggestedSalePrice) / item.estimatedOriginalPrice) * 100)}% OFF
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
 
-                          <p className="text-xs text-muted-foreground font-sans line-clamp-2 leading-relaxed italic">
-                            {item.description}
-                          </p>
+                            <p className="text-xs text-muted-foreground font-sans line-clamp-2 min-h-[2rem] leading-relaxed italic">
+                              {item.description}
+                            </p>
+                          </div>
 
                           <div className="mt-auto pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground/80 font-sans">
                             <span>

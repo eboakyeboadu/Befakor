@@ -70,6 +70,10 @@ export default function App() {
   };
 
   const [directToAuthRegister, setDirectToAuthRegister] = useState(false);
+  const [verificationTrigger, setVerificationTrigger] = useState(0);
+  const isEmailVerified = Boolean(
+    user && (user.emailVerified || localStorage.getItem(`befakor-verified-${user.uid}`) === "true")
+  );
   const [isGuestMode, setIsGuestMode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const hasParam = params.has("listing") || params.has("claimItemId");
@@ -291,7 +295,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (user && user.emailVerified) {
+    if (user && isEmailVerified) {
       setLoadingOnboarding(true);
       const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
         if (docSnap.exists() && docSnap.data().onboardingCompleted) {
@@ -310,7 +314,7 @@ export default function App() {
       setLoadingOnboarding(false);
       setOnboardingCompleted(null);
     }
-  }, [user]);
+  }, [user, isEmailVerified, verificationTrigger]);
 
   useEffect(() => {
     const handleViewSpace = (e: any) => {
@@ -381,8 +385,8 @@ export default function App() {
     );
   }
 
-  if (user && !user.emailVerified) {
-    return <VerifyEmailPage />;
+  if (user && !isEmailVerified) {
+    return <VerifyEmailPage onVerified={() => setVerificationTrigger((v) => v + 1)} />;
   }
 
   if (user && onboardingCompleted === false) {
@@ -439,9 +443,8 @@ export default function App() {
                   setCurrentMode("seller");
                   setCurrentView("create");
                 }}
-                className="hidden sm:flex bg-[#043f2e] hover:bg-black text-[#c8f169] hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer items-center gap-1.5"
+                className="hidden sm:flex bg-[#043f2e] hover:bg-black text-[#c8f169] hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer items-center"
               >
-                <Plus className="w-4 h-4" />
                 <span>Sell on Campus</span>
               </button>
 

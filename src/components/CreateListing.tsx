@@ -87,6 +87,9 @@ function guessMetadataFromFilename(filename: string) {
   if (name.includes("lab") || name.includes("beaker") || name.includes("goggle") || name.includes("glove") || name.includes("coat")) {
     return { title: "Intro Course Lab Gear Set", category: "Lab Gear", original: 45, suggested: 15, description: "Safety lab coat and goggles set, sanitized and ready." };
   }
+  if (name.includes("ticket") || name.includes("concert") || name.includes("fest") || name.includes("game") || name.includes("gala") || name.includes("formal") || name.includes("admission") || name.includes("pass") || name.includes("show")) {
+    return { title: "Student Event / Concert Ticket", category: "Event Tickets", original: 50, suggested: 30, description: "Official student admission ticket or event pass. Instant digital transfer or campus handoff." };
+  }
   
   // Default fallback if no keyword matches
   const titleWithoutExt = filename.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
@@ -983,6 +986,7 @@ export default function CreateListing({ onDone }: { onDone: () => void }) {
                           >
                             <option value="Electronics">Electronics</option>
                             <option value="Textbooks">Textbooks</option>
+                            <option value="Event Tickets">Event Tickets</option>
                             <option value="Lab Gear">Lab Gear</option>
                             <option value="Furniture">Furniture</option>
                             <option value="Appliances">Appliances</option>
@@ -1348,6 +1352,7 @@ export default function CreateListing({ onDone }: { onDone: () => void }) {
                   >
                     <option value="Electronics">Electronics</option>
                     <option value="Textbooks">Textbooks</option>
+                    <option value="Event Tickets">Event Tickets</option>
                     <option value="Lab Gear">Lab Gear</option>
                     <option value="Furniture">Furniture</option>
                     <option value="Appliances">Appliances</option>

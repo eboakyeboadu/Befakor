@@ -365,39 +365,100 @@ export default function SpacePage() {
           </div>
         </div>
       ) : (
-        /* Otherwise show standard time limit liquidation countdown banner */
-        <div id="liquidation-countdown-banner" className="bg-[#043f2e] text-white rounded-2xl p-5 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#c8f169] text-[#043f2e] px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
-              <Zap className="w-3 h-3 fill-current" />
-              <span>FLASH SALE</span>
-            </div>
-            <p className="text-xs font-semibold text-white/95">Liquidation ends in:</p>
-          </div>
+        /* Enhanced Flash Sale Banner with the real featured item included */
+        (() => {
+          const featuredItem = activeListings[0] || liamProfile.listings[0];
+          return (
+            <div id="liquidation-countdown-banner" className="bg-[#043f2e] text-white rounded-2xl p-4 sm:p-5 shadow-md space-y-3.5 border border-[#1b5e47]">
+              {/* Header row with badge and countdown timer */}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="bg-[#c8f169] text-[#043f2e] px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                    <Zap className="w-3.5 h-3.5 fill-current text-[#043f2e]" />
+                    <span>FLASH SALE</span>
+                  </div>
+                  <p className="text-xs font-semibold text-white/90">Moving Out Liquidation ends in:</p>
+                </div>
 
-          <div className="flex items-center gap-1.5">
-            <div className="flex flex-col items-center">
-              <span className="bg-white text-[#043f2e] font-black text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
-                {countdown.hours.toString().padStart(2, "0")}
-              </span>
-              <span className="text-[7.5px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">HOURS</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex flex-col items-center">
+                    <span className="bg-white text-[#043f2e] font-black text-xs sm:text-sm px-2 py-0.5 sm:py-1 rounded-md min-w-[28px] text-center shadow-xs">
+                      {countdown.hours.toString().padStart(2, "0")}
+                    </span>
+                    <span className="text-[7px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">HOURS</span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-[#c8f169] -mt-2">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="bg-white text-[#043f2e] font-black text-xs sm:text-sm px-2 py-0.5 sm:py-1 rounded-md min-w-[28px] text-center shadow-xs">
+                      {countdown.minutes.toString().padStart(2, "0")}
+                    </span>
+                    <span className="text-[7px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">MINS</span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-[#c8f169] -mt-2">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="bg-white text-[#043f2e] font-black text-xs sm:text-sm px-2 py-0.5 sm:py-1 rounded-md min-w-[28px] text-center shadow-xs">
+                      {countdown.seconds.toString().padStart(2, "0")}
+                    </span>
+                    <span className="text-[7px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">SECS</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* The Real Item Showcase Inside Flash Sale */}
+              {featuredItem && (
+                <div className="bg-white/10 hover:bg-white/15 transition-all duration-200 rounded-xl p-3 flex items-center gap-3.5 border border-white/10 group cursor-pointer"
+                  onClick={() => {
+                    const el = document.getElementById(`listing-${featuredItem.id}`);
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                  }}
+                >
+                  <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-black/20 shrink-0 border border-white/20">
+                    <img 
+                      src={featuredItem.imageUrl} 
+                      alt={featuredItem.title} 
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="absolute top-1 left-1 bg-[#c8f169] text-[#043f2e] text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-xs">
+                      Hot Pick
+                    </span>
+                  </div>
+
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-semibold text-[#c8f169] uppercase tracking-wider">Featured Deal</span>
+                    </div>
+                    <h4 className="text-white font-bold text-sm truncate group-hover:text-[#c8f169] transition-colors">
+                      {featuredItem.title}
+                    </h4>
+                    <p className="text-white/70 text-xs truncate font-sans mt-0.5">
+                      {featuredItem.description}
+                    </p>
+                    <div className="flex items-center gap-2.5 mt-1">
+                      <span className="text-base font-black text-[#c8f169]">
+                        {featuredItem.isFree || featuredItem.price === "FREE" ? "FREE" : `$${featuredItem.price}`}
+                      </span>
+                      {!featuredItem.isFree && featuredItem.price !== "FREE" && (
+                        <span className="text-xs text-white/50 line-through font-medium">
+                          ${Math.round(Number(featuredItem.price || 40) * 1.8)}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-bold bg-[#c8f169]/20 text-[#c8f169] px-1.5 py-0.5 rounded border border-[#c8f169]/30">
+                        Campus Steal
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-[#c8f169] text-[#043f2e] group-hover:translate-x-0.5 transition-transform shadow-sm">
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              )}
             </div>
-            <span className="text-sm font-bold text-[#c8f169] -mt-2">:</span>
-            <div className="flex flex-col items-center">
-              <span className="bg-white text-[#043f2e] font-black text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
-                {countdown.minutes.toString().padStart(2, "0")}
-              </span>
-              <span className="text-[7.5px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">MINS</span>
-            </div>
-            <span className="text-sm font-bold text-[#c8f169] -mt-2">:</span>
-            <div className="flex flex-col items-center">
-              <span className="bg-white text-[#043f2e] font-black text-sm px-2 py-1 rounded-md min-w-[32px] text-center">
-                {countdown.seconds.toString().padStart(2, "0")}
-              </span>
-              <span className="text-[7.5px] font-bold tracking-widest text-[#cbe19e] mt-0.5 uppercase">SECS</span>
-            </div>
-          </div>
-        </div>
+          );
+        })()
       )}
 
       {/* 2. Seller Profile Header block */}
@@ -543,6 +604,7 @@ export default function SpacePage() {
               return (
                 <div 
                   key={item.id} 
+                  id={`listing-${item.id}`}
                   className="bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/20 hover:shadow-xs transition-all duration-300 flex flex-col group relative text-left"
                 >
                   {/* Image layout */}
@@ -585,22 +647,23 @@ export default function SpacePage() {
                   {/* Info and action button */}
                   <div className="p-5 flex flex-col flex-1 justify-between gap-4">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-sm text-primary tracking-tight leading-snug group-hover:text-[#4d6700] transition-colors">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-semibold text-sm text-primary tracking-tight leading-snug group-hover:text-[#4d6700] transition-colors line-clamp-1">
                           {item.title}
                         </h4>
                         {isSpaceOwner && (
-                          <span className="bg-[#f0f7df] text-[#043f2e] text-[9px] font-extrabold tracking-wide uppercase px-2 py-0.5 rounded-full border border-primary/10">
+                          <span className="bg-[#f0f7df] text-[#043f2e] text-[9px] font-extrabold tracking-wide uppercase px-2 py-0.5 rounded-full border border-primary/10 shrink-0">
                             Active
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground font-sans leading-relaxed">
+                      <p className="text-xs text-muted-foreground font-sans leading-relaxed line-clamp-2 min-h-[2rem]">
                         {item.description}
                       </p>
                     </div>
 
-                    {isSpaceOwner ? (
+                    <div className="mt-auto pt-1">
+                      {isSpaceOwner ? (
                       /* Seller-specific actions: No WhatsApp seller button on own items! */
                       <div className="flex gap-2">
                         <button 
@@ -777,6 +840,7 @@ export default function SpacePage() {
                         )}
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               );

@@ -58,12 +58,26 @@
         "createdAt": { "type": "integer" }
       },
       "required": ["itemId", "itemTitle", "sellerId", "buyerId", "rating", "points", "createdAt"]
+    },
+    "UsernameReservation": {
+      "title": "UsernameReservation",
+      "description": "Unique username registry document preventing duplicate usernames across campus members",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid"]
     }
   },
   "firestore": {
     "users/{userId}": {
       "schema": "User",
       "description": "Stores user profiles including their selected university and dorm."
+    },
+    "usernames/{username}": {
+      "schema": "UsernameReservation",
+      "description": "Registry of taken usernames to enforce uniqueness."
     },
     "listings/{listingId}": {
       "schema": "Listing",

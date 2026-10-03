@@ -36,10 +36,12 @@ import {
   Armchair,
   Bell,
   FilterX,
-  ZoomIn
+  ZoomIn,
+  Ticket
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { handleImageErrorEvent, getCategoryFallbackImage } from "../lib/imageUtils";
+import { isStudentEmail } from "../lib/authValidation";
 
 // Curated high-fidelity showcase listings matching the mock design perfectly
 const curatedShowcaseItems = [
@@ -120,8 +122,52 @@ const curatedShowcaseItems = [
     buildingOrArea: "HBS Campus",
     createdAt: Date.now() - 3600000 * 36,
     status: "available"
+  },
+  {
+    id: "curated-6",
+    title: "Campus Spring Music Fest - 2x VIP Passes",
+    category: "tickets",
+    description: "2x VIP Student passes with backstage lounge access and commemorative wristbands. Direct student-to-student verification with instant digital barcode transfer.",
+    estimatedOriginalPrice: 120,
+    suggestedSalePrice: 75,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200"
+    ],
+    location: { lat: 42.3740, lng: -71.1170 },
+    buildingOrArea: "Harvard Yard",
+    createdAt: Date.now() - 3600000 * 4,
+    status: "available",
+    badge: "Verified Ticket"
+  },
+  {
+    id: "curated-7",
+    title: "Rivalry Game - Student Section Ticket",
+    category: "tickets",
+    description: "Lower bowl student section ticket for the upcoming rivalry football game. Student ID required at gate. Mobile ticket barcode ready for instant handoff.",
+    estimatedOriginalPrice: 60,
+    suggestedSalePrice: 40,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200"
+    ],
+    location: { lat: 42.3665, lng: -71.1260 },
+    buildingOrArea: "Harvard Stadium",
+    createdAt: Date.now() - 3600000 * 18,
+    status: "available",
+    badge: "Instant Transfer"
   }
 ];
+
+const formatCategoryLabel = (cat?: string) => {
+  if (!cat) return "Other";
+  const lower = cat.toLowerCase();
+  if (lower === "tickets" || lower === "event tickets") return "Event Tickets";
+  if (lower === "furniture") return "Furniture";
+  if (lower === "electronics") return "Electronics";
+  if (lower === "kitchen") return "Kitchen";
+  if (lower === "textbooks") return "Textbooks";
+  if (lower === "apparel" || lower === "clothing") return "Clothing";
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
+};
 
 interface HomePageProps {
   onExitGuestMode?: () => void;
@@ -149,14 +195,14 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
   // Advanced verification states
   const [isStudentVerified, setIsStudentVerified] = useState(() => {
     const user = auth.currentUser;
-    return user ? (user.email?.toLowerCase().endsWith(".edu") || false) : false;
+    return user ? isStudentEmail(user.email) : false;
   });
 
   // Sync verification status
   useEffect(() => {
     const handleVerificationUpdate = () => {
       const user = auth.currentUser;
-      setIsStudentVerified(user ? (user.email?.toLowerCase().endsWith(".edu") || false) : false);
+      setIsStudentVerified(user ? isStudentEmail(user.email) : false);
     };
     window.addEventListener("befakor-verification-updated", handleVerificationUpdate);
     return () => window.removeEventListener("befakor-verification-updated", handleVerificationUpdate);
@@ -467,7 +513,7 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
   const filteredItems = allAvailableItems.filter((item) => {
     // 1. Category Filter:
     const matchesCategory = (() => {
-      const knownCategories = ["furniture", "electronics", "kitchen", "textbooks", "apparel", "clothing"];
+      const knownCategories = ["furniture", "electronics", "kitchen", "textbooks", "tickets", "event tickets", "apparel", "clothing"];
       
       const checkMatch = (filterKey: string, itemCat?: string) => {
         if (!itemCat) return filterKey === "other";
@@ -475,6 +521,10 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
         const fKeyLower = filterKey.toLowerCase();
         
         if (fKeyLower === "all") return true;
+        
+        if (fKeyLower === "tickets" || fKeyLower === "event tickets") {
+          return catLower === "tickets" || catLower === "event tickets" || catLower === "ticket" || catLower.includes("ticket");
+        }
         
         if (fKeyLower === "apparel" || fKeyLower === "clothing") {
           return catLower === "apparel" || catLower === "clothing";
@@ -826,6 +876,7 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
       <section className="overflow-x-auto select-none no-scrollbar flex items-center py-2 gap-2">
         {[
           { key: "all", label: "All Items" },
+          { key: "tickets", label: "Event Tickets" },
           { key: "furniture", label: "Furniture" },
           { key: "electronics", label: "Electronics" },
           { key: "kitchen", label: "Kitchen" },
@@ -1010,115 +1061,94 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
               
-              {/* Highlight Featured Bento Spot (Large blocks) */}
+              {/* Highlight Featured Bento Spot (Aligned 2-column spotlight matching row height) */}
               {filteredItems.some(item => (item as any).featured) && selectedCategory === "all" && !searchTerm && (() => {
                 const feat = filteredItems.find(item => (item as any).featured) || filteredItems[0];
                 return (
-                  <div onClick={() => setActiveItem(feat)} className="md:col-span-2 md:row-span-2 bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-                    <div className="flex flex-col h-full bg-primary text-white relative">
-                      {/* Image area with absolute badges */}
-                      <div className="relative aspect-[16/10] md:h-[420px] md:aspect-auto overflow-hidden bg-muted shrink-0">
-                        <div className="relative w-full h-full">
-                          <img 
-                            src={feat.imageUrls?.[0]} 
-                            alt={feat.title}
-                            onError={(e) => handleImageErrorEvent(e, feat.category, feat.title)}
-                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-                          />
-
+                  <div 
+                    onClick={() => setActiveItem(feat)} 
+                    className="col-span-1 sm:col-span-2 lg:col-span-2 bg-card rounded-xl overflow-hidden border border-border shadow-xs hover:shadow-md transition-all duration-300 group cursor-pointer flex flex-col md:flex-row h-full text-left"
+                  >
+                    {/* Image Area - 50% width on desktop, crisp 4/3 on mobile */}
+                    <div className="relative md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden bg-muted shrink-0">
+                      <img 
+                        src={feat.imageUrls?.[0]} 
+                        alt={feat.title}
+                        onError={(e) => handleImageErrorEvent(e, feat.category, feat.title)}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {(feat as any).badge && (
+                        <div className="absolute top-3.5 left-3.5 bg-secondary text-primary font-bold px-2.5 py-1 text-[10px] uppercase tracking-wider rounded-md shadow-xs z-10">
+                          {(feat as any).badge}
                         </div>
-                        {(feat as any).badge && (
-                          <div className="absolute top-4 left-4 bg-secondary text-primary font-bold px-3 py-1.5 text-xs uppercase tracking-wider rounded-lg shadow-sm z-10">
-                            {(feat as any).badge}
-                          </div>
-                        )}
-                        <button 
-                          onClick={(e) => toggleLike(feat.id, e)}
-                          className="absolute top-4 right-4 bg-card/90 hover:bg-card text-primary p-2 rounded-full shadow-sm transition-all hover:scale-110 cursor-pointer z-10"
-                        >
-                          <Heart className={`w-5 h-5 ${likes[feat.id] ? "fill-red-500 text-red-500" : "text-primary"}`} />
-                        </button>
-                      </div>
-                      
-                      {/* Dynamic Solid-to-Overlay Info Section - Stacked sub-panel on mobile to avoid overlapping, absolutely overlayed in desktop mode */}
-                      <div className="md:absolute md:bottom-0 md:left-0 md:right-0 p-5 md:p-6 bg-primary md:bg-gradient-to-t md:from-black/95 md:via-black/60 md:to-transparent flex flex-col justify-end">
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <span className="text-[10px] md:text-xs font-bold text-secondary bg-primary-foreground/10 md:bg-primary/75 px-3 py-1 rounded-full inline-block">
+                      )}
+                      <button 
+                        onClick={(e) => toggleLike(feat.id, e)}
+                        className="absolute top-3.5 right-3.5 bg-card/90 hover:bg-card text-primary p-2 rounded-full shadow-xs transition-all hover:scale-110 cursor-pointer z-10"
+                        title="Favorite listing"
+                      >
+                        <Heart className={`w-4 h-4 ${likes[feat.id] ? "fill-red-500 text-red-500" : "text-primary"}`} />
+                      </button>
+                    </div>
+                    
+                    {/* Info Section */}
+                    <div className="p-5 md:p-6 bg-primary text-white flex flex-col justify-between flex-1">
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-bold text-secondary bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
                             {feat.buildingOrArea}
                           </span>
-                          <span className="text-[10px] uppercase font-bold text-[#c8f169] tracking-wider md:hidden">
-                            ★ Featured Listing
+                          <span className="text-[10px] uppercase font-bold text-[#c8f169] tracking-wider">
+                            ★ Campus Spotlight
                           </span>
                         </div>
                         
-                        <h3 className="text-xl md:text-3xl font-display font-medium text-white mb-2 leading-tight">
+                        <h3 className="text-lg md:text-xl font-display font-medium text-white leading-tight">
                           {feat.title}
                         </h3>
                         
-                        <p className="text-xs md:text-sm text-stone-200/95 line-clamp-3 md:line-clamp-2 max-w-xl mb-4 font-sans leading-relaxed">
+                        <p className="text-xs text-stone-200/90 line-clamp-3 font-sans leading-relaxed">
                           {feat.description}
                         </p>
-                        
-                        <div className="flex items-baseline gap-2 pt-2 border-t border-white/10 md:border-t-0 md:pt-0">
-                          <span className="text-xl md:text-2xl font-bold text-secondary">${feat.suggestedSalePrice}</span>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-white/15 flex items-center justify-between mt-4">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xl font-bold text-secondary">${feat.suggestedSalePrice}</span>
                           <span className="text-xs line-through text-white/50">${feat.estimatedOriginalPrice}</span>
                           {feat.estimatedOriginalPrice > feat.suggestedSalePrice && (
-                            <span className="bg-[#c8f169] text-[#043f2e] text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                            <span className="bg-[#c8f169] text-[#043f2e] text-[9px] font-bold px-1.5 py-0.5 rounded shadow-xs">
                               {Math.round(((feat.estimatedOriginalPrice - feat.suggestedSalePrice) / feat.estimatedOriginalPrice) * 100)}% OFF
                             </span>
                           )}
                         </div>
+                        <span className="text-xs text-[#c8f169] font-bold group-hover:underline inline-flex items-center gap-1">
+                          <span>View Item</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
                       </div>
                     </div>
                   </div>
                 );
               })()}
 
-              {/* Grid of Other standard sized listings cards */}
+              {/* Grid of Standard listings cards */}
               {(() => {
-                const itemsToRender = filteredItems.filter(item => selectedCategory !== "all" || searchTerm || !(item as any).featured);
-                return itemsToRender.map((item, idx) => {
-                  const showBannerHere = idx === 2 && !searchTerm;
-                  return (
-                    <div key={item.id} className="contents">
-                      {showBannerHere && (
-                        <div 
-                          key="moving-soon-cta-banner"
-                          className="bg-gradient-to-br from-[#043f2e] to-[#0c4a37] rounded-xl overflow-hidden border border-[#c8f169]/10 shadow-sm flex flex-col justify-between p-5 text-left text-white relative group animate-in fade-in duration-300"
-                        >
-                          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#c8f169]/10 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300" />
-                          <div className="space-y-2 relative z-10">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#c8f169] bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
-                              CAMPUS MOBILITY
-                            </span>
-                            <h3 className="font-display font-medium text-lg text-white leading-tight">
-                              Moving soon? Or clearing space?
-                            </h3>
-                            <p className="text-[11px] text-stone-200/90 font-sans leading-relaxed">
-                              Set up a private Seller Space with a few taps. List items directly to your peers and handle handoffs without the hassle.
-                            </p>
-                          </div>
-                          
-                          <button 
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onGoToSellerDashboard?.("create");
-                            }}
-                            className="mt-4 w-full bg-[#c8f169] hover:bg-white text-[#043f2e] hover:text-black py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-sm active:scale-95 text-center block"
-                          >
-                            Launch My Space +
-                          </button>
-                        </div>
-                      )}
-                      
-                      <article 
-                        onClick={() => setActiveItem(item)}
-                        className="bg-card rounded-xl overflow-hidden border border-border shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col h-full cursor-pointer"
-                      >
-                    <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+                const isDefaultShowcase = selectedCategory === "all" && !searchTerm;
+                const featuredItem = filteredItems.find(item => (item as any).featured);
+                const standardItems = isDefaultShowcase 
+                  ? filteredItems.filter(item => !(item as any).featured)
+                  : filteredItems;
+
+                const renderCard = (item: Listing) => (
+                  <article 
+                    key={item.id}
+                    onClick={() => setActiveItem(item)}
+                    className="bg-card rounded-xl overflow-hidden border border-border shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col h-full cursor-pointer text-left"
+                  >
+                    <div className="relative aspect-[4/3] bg-muted overflow-hidden shrink-0">
                       {item.imageUrls?.[0] ? (
                         <div className="relative w-full h-full">
                           <img 
@@ -1127,14 +1157,13 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
                             onError={(e) => handleImageErrorEvent(e, item.category, item.title)}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-105 contrast-[1.08] saturate-[1.12]"
                           />
-                          {/* Studio Spotlight Mask to hide background clutter */}
+                          {/* Studio Spotlight Mask */}
                           <div 
                             className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-55"
                             style={{
                               background: "radial-gradient(circle at center, transparent 35%, rgba(15, 23, 42, 0.8) 100%)"
                             }}
                           />
-
                         </div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
@@ -1150,28 +1179,29 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
 
                       <button 
                         onClick={(e) => toggleLike(item.id, e)}
-                        className="absolute top-3 right-3 bg-card/90 hover:bg-card text-primary p-1.5 rounded-full shadow-xs transition-transform hover:scale-110 cursor-pointer"
+                        className="absolute top-3 right-3 bg-card/90 hover:bg-card text-primary p-1.5 rounded-full shadow-xs transition-transform hover:scale-110 cursor-pointer z-10"
+                        title="Favorite listing"
                       >
                         <Heart className={`w-4 h-4 ${likes[item.id] ? "fill-red-500 text-red-500" : "text-primary"}`} />
                       </button>
                     </div>
 
-                    <div className="p-4 flex flex-col flex-grow justify-between gap-3">
+                    <div className="p-4 flex flex-col flex-1 justify-between gap-3">
                       <div>
-                        <div className="flex items-center gap-1.5 mb-1 bg-primary/5 px-2 py-0.5 rounded-sm w-fit">
+                        <div className="flex items-center gap-1.5 mb-1 bg-primary/5 px-2 py-0.5 rounded-xs w-fit">
                           <span className="text-[9px] font-bold tracking-wider uppercase text-primary">
-                            {item.category}
+                            {formatCategoryLabel(item.category)}
                           </span>
                         </div>
-                        <h3 className="font-display font-semibold text-lg text-primary leading-tight line-clamp-1 mb-1">
+                        <h3 className="font-display font-semibold text-base text-primary leading-tight line-clamp-1 mb-1">
                           {item.title}
                         </h3>
-                        <p className="text-xs text-muted-foreground/90 line-clamp-2 md:line-clamp-3">
+                        <p className="text-xs text-muted-foreground/90 line-clamp-2 min-h-[2rem] leading-relaxed font-sans">
                           {item.description}
                         </p>
                       </div>
 
-                      <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                      <div className="mt-auto pt-3 border-t border-border/60 flex items-center justify-between">
                         <div className="flex flex-col">
                           <span className="font-bold text-primary text-base">${item.suggestedSalePrice}</span>
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -1183,16 +1213,62 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="w-3.5 h-3.5 text-primary" />
-                          <span className="font-medium line-clamp-1 max-w-[100px]">{item.buildingOrArea}</span>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="font-medium line-clamp-1 max-w-[110px]">{item.buildingOrArea}</span>
                         </div>
                       </div>
                     </div>
                   </article>
+                );
+
+                if (!isDefaultShowcase || !featuredItem) {
+                  return standardItems.map(renderCard);
+                }
+
+                // In default showcase: Row 1 has Featured (2 cols) + First 2 items (1 col each = 4 cols total).
+                // Then clean full-width Campus Mobility Banner.
+                // Then remaining items render in clean 4-col rows!
+                const firstRowItems = standardItems.slice(0, 2);
+                const remainingItems = standardItems.slice(2);
+
+                return (
+                  <>
+                    {firstRowItems.map(renderCard)}
+
+                    {/* Sectional Full-Width Campus Mobility Banner */}
+                    <div 
+                      key="moving-soon-cta-banner"
+                      className="col-span-1 sm:col-span-2 lg:col-span-4 bg-gradient-to-r from-[#043f2e] via-[#064e3b] to-[#043f2e] rounded-2xl p-6 md:p-8 text-white shadow-sm border border-[#c8f169]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden text-left my-2 group animate-in fade-in duration-300"
+                    >
+                      <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#c8f169]/10 to-transparent rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+                      <div className="space-y-2 relative z-10 max-w-xl">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[#c8f169] bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
+                          CAMPUS MOBILITY
+                        </span>
+                        <h3 className="font-display font-medium text-xl md:text-2xl text-white leading-tight">
+                          Moving soon? Or clearing space?
+                        </h3>
+                        <p className="text-xs md:text-sm text-stone-200/90 font-sans leading-relaxed">
+                          Set up a private Seller Space with a few taps. List items directly to your peers and handle handoffs without the hassle.
+                        </p>
+                      </div>
+                      
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onGoToSellerDashboard?.("create");
+                        }}
+                        className="shrink-0 bg-[#c8f169] hover:bg-white text-[#043f2e] hover:text-black py-3 px-6 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 cursor-pointer shadow-sm active:scale-95 text-center relative z-10"
+                      >
+                        Launch My Space +
+                      </button>
                     </div>
-                  );
-                });
+
+                    {remainingItems.map(renderCard)}
+                  </>
+                );
               })()}
 
             </div>
@@ -1404,7 +1480,7 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
                     </h1>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-semibold capitalize text-primary bg-primary/5 px-2 py-0.5 rounded">
-                        {activeItem.category}
+                        {formatCategoryLabel(activeItem.category)}
                       </span>
                       <span className="text-xs text-muted-foreground">• Listed {formatDistanceToNow(activeItem.createdAt || Date.now())} ago</span>
                     </div>
@@ -1787,9 +1863,10 @@ export default function HomePage({ onExitGuestMode, onGoToAccount, onGoToSellerD
                   <label className="text-xs font-bold uppercase tracking-wider text-primary">Category</label>
                   <span className="text-[11px] text-muted-foreground">Select one or more</span>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {[
                     { key: "all", label: "All Items", icon: Grid },
+                    { key: "tickets", label: "Event Tickets", icon: Ticket },
                     { key: "furniture", label: "Furniture", icon: Armchair },
                     { key: "electronics", label: "Electronics", icon: Laptop },
                     { key: "kitchen", label: "Kitchen", icon: Coffee },

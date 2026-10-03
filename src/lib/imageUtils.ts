@@ -83,6 +83,9 @@ export function getCategoryFallbackImage(category?: string, title?: string): str
   if (t.includes("headphone") || t.includes("audio") || t.includes("speaker") || t.includes("anc")) {
     return "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600"; // Headphones
   }
+  if (t.includes("ticket") || t.includes("concert") || t.includes("fest") || t.includes("game") || t.includes("formal") || t.includes("gala") || t.includes("admission") || t.includes("pass")) {
+    return "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600"; // Concert / live stage lights event
+  }
 
   const cat = (category || "").toLowerCase();
   switch (cat) {
@@ -91,6 +94,10 @@ export function getCategoryFallbackImage(category?: string, title?: string): str
     case "textbooks":
     case "books":
       return "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600"; // books
+    case "tickets":
+    case "event tickets":
+    case "events":
+      return "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600"; // Concert / event tickets
     case "lab gear":
     case "science":
       return "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=600"; // lab microscope / tube

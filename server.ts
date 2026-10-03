@@ -41,7 +41,7 @@ async function startServer() {
       
       // Determine base URL for success/cancel redirects
       let baseUrl = returnUrl;
-      if (!baseUrl || baseUrl.includes("ai.studio")) {
+      if (!baseUrl) {
         const proto = req.headers["x-forwarded-proto"] || req.protocol || "http";
         const host = req.headers["x-forwarded-host"] || req.get("host") || "localhost:3000";
         baseUrl = `${proto}://${host}`;
@@ -96,7 +96,7 @@ async function startServer() {
       const prompt = `Identify the main item visible in the uploaded image using your computer vision capabilities. Do NOT base your analysis solely on the filename of the image; prioritize your vision reasoning to see the item and identify what it is (e.g., if it is a stroller, a lamp, a textbook, clothing, etc.).
 Generate a strict JSON response containing:
 - title: A very short, catchy title (e.g., "IKEA Desk", "Mini Fridge", "Adjustable Lamp", "Baby Stroller").
-- category: One of: "Furniture", "Electronics", "Appliances", "Decor", "Clothing", "Other".
+- category: One of: "Event Tickets", "Textbooks", "Furniture", "Electronics", "Appliances", "Decor", "Clothing", "Other".
 - description: A brief appealing description of the item, its condition, and why it's great for campus or student use.
 - estimatedOriginalPrice: A realistic integer estimate of the original retail price in USD.
 - suggestedSalePrice: A suggested reasonable integer price for quick resale in USD.
