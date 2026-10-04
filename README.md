@@ -1,33 +1,131 @@
 # Befakor
 
-This project is a demo marketplace app with Firebase-backed auth, storage, and Firestore. It is intended for learning, internal testing, or a private demo environment only.
+Befakor is a student marketplace platform designed to help communities buy, sell, and discover goods and services in a trusted, campus-focused environment. The app is built around a modern React frontend, a lightweight Node/Express backend, and Firebase services for authentication, storage, and data persistence.
 
-## Security notice
+---
 
-This repository originally included Firebase client configuration values in a committed config file. Before making the app public, confirm the Firebase project is a dedicated demo project and that the web API key is not tied to a production environment.
+## Why this project exists
 
-The app uses Firebase client configuration and therefore should not be treated as a no-auth public app. A production-safe public release requires:
+The goal of Befakor is to make local exchange easier and safer for students and communities by combining:
 
-- a dedicated Firebase project
-- Firebase Security Rules that restrict access
-- no real user data or listings in the database
-- no secrets in committed files
-- a clean review of all env and config files in Git history
+- user authentication and profile management
+- listing creation and discovery
+- media uploads for product or service posts
+- search and filtering for relevant listings
+- support for digital payments and checkout flows
+- a scalable foundation for future marketplace features
 
-## Run locally
+---
+
+## Core features
+
+- Secure user sign-in and account management with Firebase Auth
+- Marketplace listings with rich metadata and media support
+- Upload and storage of images and other assets
+- Search, filtering, and browsing experience optimized for discovery
+- Payment-ready integration using Stripe
+- Google Maps integration for location-aware experiences
+- Vite + React front end with TypeScript for a fast developer workflow
+- Express server for API and backend logic
+
+---
+
+## Tech stack
+
+- Frontend: React, TypeScript, Vite, Tailwind CSS
+- Backend: Node.js, Express
+- Authentication & data: Firebase Auth, Firestore, Firebase Storage
+- Payments: Stripe
+- Map integration: Google Maps React
+- Media handling: Multer
+
+---
+
+## Project structure
+
+```text
+Befakor/
+├── src/                 # Frontend application source
+├── public/              # Static public assets
+├── server.ts            # Express server entrypoint
+├── package.json         # Scripts and dependency definitions
+├── vite.config.ts       # Vite configuration
+├── tsconfig.json        # TypeScript config
+├── .env.example         # Sample environment variables
+├── README.md            # Project documentation
+└── LICENSE              # License details
+```
+
+---
+
+## Getting started
+
+### 1. Install dependencies
 
 ```bash
 npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file based on `.env.example` and add your project credentials, including Firebase and Stripe configuration values as needed by the app.
+
+### 3. Run the app locally
+
+```bash
 npm run dev
 ```
 
-## Important
+This starts the development server for the app.
 
-- Do not commit real user data or uploaded photos.
-- Restrict Firestore and Storage access to signed-in users only.
-- Keep all Firebase rules private and reviewed before any public access.
-- If you intend to share this repo publicly, remove all project-specific Firebase configuration and replace it with placeholders.
+### 4. Build for production
+
+```bash
+npm run build
+```
+
+### 5. Start production server
+
+```bash
+npm start
+```
+
+---
+
+## Available scripts
+
+```bash
+npm run dev      # Start the application in development mode
+npm run build    # Build the frontend and backend bundle
+npm run start    # Run the compiled production server
+npm run lint     # Type-check the TypeScript project
+npm run clean    # Remove generated build artifacts
+```
+
+---
+
+## Security notice
+
+This project is a demo or development application and should not be treated as a public, no-auth marketplace without additional hardening.
+
+Before deploying publicly, make sure to:
+
+- use a dedicated Firebase project for demo or production data
+- restrict Firestore and Storage access to authenticated users only
+- remove real user data and sample listings from the database
+- never commit secrets or production credentials to the repository
+- review Firebase rules and Stripe configuration before launch
+
+If you plan to share this repo publicly, replace any environment-specific credentials with placeholders and keep deployment configuration separate from source control.
+
+---
+
+## Contributing
+
+Contributions are welcome. If you want to improve the app, add new marketplace features, or refine the user experience, feel free to open an issue or submit a pull request.
+
+---
 
 ## License
 
-This project is released under the MIT License. See [LICENSE](LICENSE).
+This project is licensed under the MIT License. See the LICENSE file for details.
