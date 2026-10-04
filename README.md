@@ -104,28 +104,6 @@ npm run clean    # Remove generated build artifacts
 
 ---
 
-## Security notice
-
-This project is a demo or development application and should not be treated as a public, no-auth marketplace without additional hardening.
-
-Before deploying publicly, make sure to:
-
-- use a dedicated Firebase project for demo or production data
-- restrict Firestore and Storage access to authenticated users only
-- remove real user data and sample listings from the database
-- never commit secrets or production credentials to the repository
-- review Firebase rules and Stripe configuration before launch
-
-If you plan to share this repo publicly, replace any environment-specific credentials with placeholders and keep deployment configuration separate from source control.
-
----
-
-## Contributing
-
-Contributions are welcome. If you want to improve the app, add new marketplace features, or refine the user experience, feel free to open an issue or submit a pull request.
-
----
-
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
